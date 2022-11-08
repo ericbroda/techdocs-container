@@ -1,32 +1,11 @@
-# Copyright 2020 Spotify AB
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# SOURCE: https://github.com/backstage/backstage/issues/4123
+FROM spotify/techdocs:latest
 
-FROM python:3.8-alpine
+RUN apk --no-cache add nodejs npm chromium
 
-RUN apk update && apk --no-cache add gcc musl-dev openjdk17-jdk curl graphviz ttf-dejavu fontconfig
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-# Download plantuml file, Validate checksum & Move plantuml file
-RUN curl -o plantuml.jar -L http://sourceforge.net/projects/plantuml/files/plantuml.1.2022.4.jar/download && echo "246d1ed561ebbcac14b2798b45712a9d018024c0  plantuml.jar" | sha1sum -c - && mv plantuml.jar /opt/plantuml.jar
+RUN npm install -g @mermaid-js/mermaid-cli@8.13.7
 
-RUN pip install --upgrade pip && pip install mkdocs-techdocs-core==1.1.7
-
-# Create script to call plantuml.jar from a location in path
-#   When adding TechDocs to the Backstage Backend container, avoid this
-#   error (OSError: [Errno 8] Exec format error: 'plantuml') by using the
-#   following RUN command instead:
-#   RUN echo '#!/bin/sh\n\njava -jar '/opt/plantuml.jar' ${@}' >> /usr/local/bin/plantuml
-RUN echo $'#!/bin/sh\n\njava -jar '/opt/plantuml.jar' ${@}' >> /usr/local/bin/plantuml
-RUN chmod 755 /usr/local/bin/plantuml
-
-ENTRYPOINT [ "mkdocs" ]
+RUN pip install markdown-inline-mermaid==1.0.2

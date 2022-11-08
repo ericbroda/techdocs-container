@@ -1,3 +1,4 @@
+# SOURCE: https://github.com/backstage/backstage/issues/4123
 site_name: 'mock-docs'
 site_description: 'mock-docs site description'
 
@@ -6,5 +7,12 @@ nav:
   - SubDocs: '!include ./sub-docs/mkdocs.yml'
   - Plugins: '*include ./plugins/*/mkdocs.yml'
 
+theme:
+  name: material
+  highlightjs: true
+
 plugins:
   - techdocs-core
+
+markdown_extensions:
+  - markdown_inline_mermaid
